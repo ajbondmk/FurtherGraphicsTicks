@@ -52,8 +52,12 @@ float cube(vec3 p) {
   return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0));
 }
 
+float scene(vec3 p) {
+    return cube(p);
+}
+
 vec3 getNormal(vec3 pt) {
-  return normalize(GRADIENT(pt, sphere));
+  return normalize(GRADIENT(pt, scene));
 }
 
 vec3 getColor(vec3 pt) {
@@ -88,8 +92,7 @@ vec3 raymarch(vec3 camPos, vec3 rayDir) {
   float t = 0;
 
   for (float d = 1000; step < RENDER_DEPTH && abs(d) > CLOSE_ENOUGH; t += abs(d)) {
-    //d = sphere(camPos + t * rayDir);
-    d = cube(camPos + t * rayDir);
+    d = scene(camPos + t * rayDir);
     step++;
   }
 
