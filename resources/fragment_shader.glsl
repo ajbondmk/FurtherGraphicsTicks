@@ -53,7 +53,32 @@ float cube(vec3 p) {
 }
 
 float scene(vec3 p) {
-    return cube(p);
+  return min(
+    min(
+      min(
+        //left
+        cube(p + vec3(3,0,3)),
+        sphere(p + vec3(2,0,2))
+      ),
+      min(
+        //right
+        cube(p + vec3(-3,0,-3)),
+        sphere(p + vec3(-4,0,-4))
+      )
+    ),
+    min(
+      min(
+        //top
+        cube(p + vec3(-3,0,3)),
+        sphere(p + vec3(-4,0,2))
+      ),
+      min(
+        //bottom
+        cube(p + vec3(3,0,-3)),
+        sphere(p + vec3(2,0,-4))
+      )
+    )
+  );
 }
 
 vec3 getNormal(vec3 pt) {
