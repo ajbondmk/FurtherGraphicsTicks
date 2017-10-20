@@ -52,6 +52,12 @@ float cube(vec3 p) {
   return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0));
 }
 
+float minBlended(float a, float b) {
+  float k = 0.2;
+  float h = clamp(0.5 + 0.5 * (b - a) / k, 0, 1);
+  return (mix(b, a, h) - k * h * (1 - h));
+}
+
 float scene(vec3 p) {
   return min(
     min(
@@ -60,19 +66,19 @@ float scene(vec3 p) {
         cube(p + vec3(3,0,3)),
         sphere(p + vec3(2,0,2))
       ),
-      min(
+      max(
         //right
         cube(p + vec3(-3,0,-3)),
         sphere(p + vec3(-4,0,-4))
       )
     ),
     min(
-      min(
+      max(
         //top
         cube(p + vec3(-3,0,3)),
-        sphere(p + vec3(-4,0,2))
+        -sphere(p + vec3(-4,0,2))
       ),
-      min(
+      minBlended(
         //bottom
         cube(p + vec3(3,0,-3)),
         sphere(p + vec3(2,0,-4))
