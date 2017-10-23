@@ -52,7 +52,7 @@ float cube(vec3 pt) {
   return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0));
 }
 
-float torus2(vec3 pt, float rMajor, float rMinor) {
+float torus(vec3 pt, float rMajor, float rMinor) {
   return length(vec2(length(pt.xz) - rMajor, pt.y)) - rMinor;
 }
 
@@ -63,7 +63,8 @@ float minBlended(float a, float b) {
 }
 
 float scene(vec3 p) {
-  return torus2(p + vec3(0,-3,0), 3.0, 1.0);
+  vec3 pNew = vec3(p.x, p.z, p.y - 3);
+  return torus(pNew, 3.0, 1.0);
 }
 
 bool isPlane(vec3 pt) {
