@@ -63,7 +63,7 @@ float minBlended(float a, float b) {
 }
 
 float scene(vec3 p) {
-  return torus2(p, 3.0, 1.0);
+  return torus2(p + vec3(0,-3,0), 3.0, 1.0);
 }
 
 bool isPlane(vec3 pt) {
@@ -93,7 +93,9 @@ float shade(vec3 eye, vec3 pt, vec3 n) {
   
   for (int i = 0; i < LIGHT_POS.length(); i++) {
     vec3 l = normalize(LIGHT_POS[i] - pt); 
-    val += max(dot(n, l), 0);
+    val += max(dot(n, l), 0);  // Diffuse
+    vec3 r = 2 * dot(n, l) * n - l;
+    val += pow(max(dot(r, normalize(eye - pt)), 0), 256);  // Specular
   }
   return val;
 }
