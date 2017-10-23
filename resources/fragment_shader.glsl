@@ -63,8 +63,27 @@ float minBlended(float a, float b) {
 }
 
 float scene(vec3 p) {
-  vec3 pNew = vec3(p.x, p.z, p.y - 3);
-  return torus(pNew, 3.0, 1.0);
+  p = vec3(mod(p.x - 4, 8) - 4, p.y, mod(p.z, 8));
+  vec3 p1 = vec3(p.x, p.y, p.z - 4);
+  vec3 p2a = vec3(p.x + 4, p.z - 4, p.y);
+  vec3 p2b = vec3(p.x - 4, p.z - 4, p.y);
+  vec3 p3a = vec3(p.y, p.x, p.z);
+  vec3 p3b = vec3(p.y, p.x, p.z - 8);
+  float rMajor = 3;
+  float rMinor = 0.5;
+  return min(
+    torus(p1, rMajor, rMinor),
+    min(
+      min(
+        torus(p2a, rMajor, rMinor),
+        torus(p2b, rMajor, rMinor)
+      ),
+      min(
+        torus(p3a, rMajor, rMinor),
+        torus(p3b, rMajor, rMinor)
+      )
+    )
+  );
 }
 
 bool isPlane(vec3 pt) {
