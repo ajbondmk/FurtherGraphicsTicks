@@ -48,8 +48,12 @@ float sphere(vec3 pt) {
 }
 
 float cube(vec3 pt) {
-  vec3 d = abs(pt) - vec3(1); // 1 = radius
+  vec3 d = abs(pt) - vec3(1);
   return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0));
+}
+
+float torus2(vec3 pt, float rMajor, float rMinor) {
+  return length(vec2(length(pt.xz) - rMajor, pt.y)) - rMinor;
 }
 
 float minBlended(float a, float b) {
@@ -59,32 +63,7 @@ float minBlended(float a, float b) {
 }
 
 float scene(vec3 p) {
-  return min(
-    min(
-      min(
-        //left
-        cube(p + vec3(3,0,3)),
-        sphere(p + vec3(2,0,2))
-      ),
-      max(
-        //right
-        cube(p + vec3(-3,0,-3)),
-        sphere(p + vec3(-4,0,-4))
-      )
-    ),
-    min(
-      max(
-        //top
-        cube(p + vec3(-3,0,3)),
-        -sphere(p + vec3(-4,0,2))
-      ),
-      minBlended(
-        //bottom
-        cube(p + vec3(3,0,-3)),
-        sphere(p + vec3(2,0,-4))
-      )
-    )
-  );
+  return torus2(p + vec3(0,-3,0), 3.0, 1.0);
 }
 
 bool isPlane(vec3 pt) {
@@ -114,7 +93,9 @@ float shade(vec3 eye, vec3 pt, vec3 n) {
   
   for (int i = 0; i < LIGHT_POS.length(); i++) {
     vec3 l = normalize(LIGHT_POS[i] - pt); 
-    val += max(dot(n, l), 0);
+    val += max(dot(n, l), 0);  // Diffuse
+    vec3 r = 2 * dot(n, l) * n - l;
+    val += pow(max(dot(r, normalize(eye - pt)), 0), 256);  // Specular
   }
   return val;
 }
