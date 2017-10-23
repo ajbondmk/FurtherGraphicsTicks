@@ -93,10 +93,29 @@ float shade(vec3 eye, vec3 pt, vec3 n) {
   val += 0.1;  // Ambient
   
   for (int i = 0; i < LIGHT_POS.length(); i++) {
-    vec3 l = normalize(LIGHT_POS[i] - pt); 
-    val += max(dot(n, l), 0);  // Diffuse
+    float valToAdd = 0;
+    vec3 ptToLight = LIGHT_POS[i] - pt;
+
+    vec3 l = normalize(ptToLight);
+    valToAdd += max(dot(n, l), 0);  // Diffuse
+
     vec3 r = 2 * dot(n, l) * n - l;
-    val += pow(max(dot(r, normalize(eye - pt)), 0), 256);  // Specular
+    valToAdd += pow(max(dot(r, normalize(eye - pt)), 0), 256);  // Specular
+
+    float kd = 1;
+    int step = 0;
+    for (float t = 0.1; t < length(ptToLight) && step < RENDER_DEPTH && kd > 0.001; ) {
+      float d = abs(scene(pt + t * l));
+      if (d < 0.001) {
+          kd = 0;
+      } else {
+          kd = min(kd, 16 * d / t);
+      }
+      t += d;
+      step++;
+    }
+
+    val += kd * valToAdd;
   }
   return val;
 }
