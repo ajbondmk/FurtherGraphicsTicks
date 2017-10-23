@@ -47,8 +47,8 @@ float sphere(vec3 pt) {
   return length(pt) - 1;
 }
 
-float cube(vec3 p) {
-  vec3 d = abs(p) - vec3(1); // 1 = radius
+float cube(vec3 pt) {
+  vec3 d = abs(pt) - vec3(1); // 1 = radius
   return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0));
 }
 
@@ -87,11 +87,21 @@ float scene(vec3 p) {
   );
 }
 
+bool isPlane(vec3 pt) {
+    return (pt.y > -1.001 && pt.y < -0.999);
+}
+
 vec3 getNormal(vec3 pt) {
+  if (isPlane(pt)) return vec3(0,1,0);
   return normalize(GRADIENT(pt, scene));
 }
 
 vec3 getColor(vec3 pt) {
+  if (isPlane(pt)) {
+    float distance = scene(pt);
+    if (mod(distance, 5) > 4.75) return vec3(0,0,0);
+    return mix(vec3(0.4,1,0.4), vec3(0.4,0.4,1), mod(distance,1));
+  }
   return vec3(1);
 }
 
@@ -123,7 +133,8 @@ vec3 raymarch(vec3 camPos, vec3 rayDir) {
   float t = 0;
 
   for (float d = 1000; step < RENDER_DEPTH && abs(d) > CLOSE_ENOUGH; t += abs(d)) {
-    d = scene(camPos + t * rayDir);
+    vec3 pt = camPos + t * rayDir;
+    d = min(pt.y + 1, scene(pt));
     step++;
   }
 
